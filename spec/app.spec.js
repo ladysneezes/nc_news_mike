@@ -46,6 +46,17 @@ describe.only("/", () => {
               expect(body.user[0].username).to.equal("icellusedkars");
             });
         });
+        it("GET for an unfound username - status:404 and error message", () => {
+          return request(app)
+            .get("/api/users/notAnID")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                `No user found for username: notAnID`
+              );
+              expect(response.statusCode).to.equal(404);
+            });
+        });
       });
     });
   });
