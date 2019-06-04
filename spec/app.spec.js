@@ -59,5 +59,26 @@ describe.only("/", () => {
         });
       });
     });
+    describe("/articles", () => {
+      describe("/:article_id", () => {
+        it("GET status 200 returns article", () => {
+          return request(app)
+            .get("/api/articles/10")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.article).to.be.an("array");
+              expect(body.article[0]).to.contain.keys(
+                "author",
+                "title",
+                "article_id",
+                "body",
+                "topic",
+                "created_at",
+                "votes"
+              );
+            });
+        });
+      });
+    });
   });
 });
