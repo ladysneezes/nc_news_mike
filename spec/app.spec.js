@@ -63,7 +63,7 @@ describe.only("/", () => {
       describe("/:article_id", () => {
         it("GET status 200 returns article", () => {
           return request(app)
-            .get("/api/articles/10")
+            .get("/api/articles/1")
             .expect(200)
             .then(({ body }) => {
               expect(body.article).to.be.an("array");
@@ -74,8 +74,19 @@ describe.only("/", () => {
                 "body",
                 "topic",
                 "created_at",
-                "votes"
+                "votes",
+                "comment_count"
               );
+              expect(body.article[0]).to.eql({
+                author: "butter_bridge",
+                title: "Living in the shadow of a great man",
+                article_id: 1,
+                body: "I find this existence challenging",
+                topic: "mitch",
+                created_at: "2018-11-15T12:21:54.171Z",
+                votes: 100,
+                comment_count: "13"
+              });
             });
         });
       });

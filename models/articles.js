@@ -2,15 +2,10 @@ const connection = require("../db/connection");
 
 exports.fetchArticleByArticleId = ({ article_id }) => {
   return connection
-    .select(
-      "author",
-      "title",
-      "article_id",
-      "body",
-      "topic",
-      "created_at",
-      "votes"
-    )
+    .select("articles.*")
     .from("articles")
-    .where({ article_id });
+    .count({ comment_count: "comment_id" })
+    .leftJoin("comments", "comments.article_id", "articles.article_id")
+    .groupBy("articles.article_id")
+    .having("articles.article_id", "=", article_id);
 };
