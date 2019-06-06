@@ -5,6 +5,7 @@ const { sendUser } = require("../controllers/users");
 usersRouter
   .route("/:username")
   .get(sendUser)
+
   .all(methodNotAllowed);
 
 module.exports = usersRouter;

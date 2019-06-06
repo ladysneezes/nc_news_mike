@@ -4,5 +4,8 @@ exports.fetchUserByUsername = ({ username }) => {
   return connection
     .select("username", "avatar_url", "name")
     .from("users")
-    .where({ username });
+    .where({ username })
+    .then(([user]) => {
+      return user;
+    });
 };
