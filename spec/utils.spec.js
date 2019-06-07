@@ -8,7 +8,7 @@ const {
 } = require("../utils/index");
 
 describe("/utils", () => {
-  describe.only("timestampToDate", () => {
+  describe("timestampToDate", () => {
     it("should return a new empty array when given an empty array", () => {
       const actual = timestampToDate([]);
       const expected = [];
@@ -32,7 +32,7 @@ describe("/utils", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
-          created_at: "2018-11-15T12:21:54.171Z",
+          created_at: "Thu Nov 15 2018 12:21:54 GMT+0000 (Greenwich Mean Time)",
           votes: 100
         }
       ];
@@ -63,7 +63,7 @@ describe("/utils", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
-          created_at: "2018-11-15T12:21:54.171Z",
+          created_at: "Thu Nov 15 2018 12:21:54 GMT+0000 (Greenwich Mean Time)",
           votes: 100
         },
         {
@@ -71,7 +71,7 @@ describe("/utils", () => {
           topic: "mitch",
           author: "icellusedkars",
           body: "Call me Mitchell.",
-          created_at: "[Date: 2014-11-16T12:21:54.171Z]"
+          created_at: "Sun Nov 16 2014 12:21:54 GMT+0000 (Greenwich Mean Time)"
         }
       ];
       expect(actual[0]).to.not.equal(expected[0]);

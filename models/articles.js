@@ -1,4 +1,5 @@
 const connection = require("../db/connection");
+const { fetchUserByUsername } = require("./users");
 
 exports.fetchArticleByArticleId = ({ article_id }) => {
   return connection
@@ -37,11 +38,17 @@ exports.fetchCommentsByArticleId = (
   { article_id },
   { sort_by = "created_at", order = "desc" }
 ) => {
-  return connection
-    .select("*")
-    .from("comments")
-    .where("article_id", "=", article_id)
-    .orderBy(sort_by, order);
+  if (order !== "desc" && order !== "asc") {
+    return Promise.reject({
+      status: 400,
+      msg: `Bad Request`
+    });
+  } else
+    return connection
+      .select("*")
+      .from("comments")
+      .where("article_id", "=", article_id)
+      .orderBy(sort_by, order);
 };
 
 exports.fetchArticles = ({
@@ -50,6 +57,15 @@ exports.fetchArticles = ({
   author = null,
   topic = null
 }) => {
+  console.log(author, "author in original model");
+  if (author) {
+    return fetchUserByUsername({ username: author });
+  } else if (order !== "desc" && order !== "asc") {
+    return Promise.reject({
+      status: 400,
+      msg: `Bad Request`
+    });
+  } else;
   return connection
     .select("articles.*")
     .from("articles")

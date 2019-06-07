@@ -6,7 +6,7 @@ const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
 
-describe.only("/", () => {
+describe("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
@@ -47,7 +47,7 @@ describe.only("/", () => {
               expect(body.user.username).to.equal("icellusedkars");
             });
         });
-        it("GET for an unfound username - status:404 and error message", () => {
+        it.only("GET for an unfound username - status:404 and error message", () => {
           return request(app)
             .get("/api/users/notAnID")
             .expect(404)
@@ -127,14 +127,22 @@ describe.only("/", () => {
             expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
           });
       });
-      // it("none existent author sent order query sent returns 400", () => {
-      //   return request(app)
-      //     .get("/api/articles?author=NOTANAUTHOR")
-      //     .expect(400)
-      //     .then(res => {
-      //       expect(res.body.msg).to.equal(``);
-      //     });
-      // });
+      it("invalid order query sent returns 400", () => {
+        return request(app)
+          .get("/api/articles?order=NotAnOrder")
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal(`Bad Request`);
+          });
+      });
+      it.only("none existent author sent order query sent returns 400", () => {
+        return request(app)
+          .get("/api/articles?author=NOTANAUTHOR")
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal(``);
+          });
+      });
     });
     describe("/:article_id", () => {
       it("GET status 200 returns article", () => {
@@ -246,84 +254,100 @@ describe.only("/", () => {
             );
           });
       });
-      describe("/comments", () => {
-        it("POST status 201 responds with comment data", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send({ username: "icellusedkars", body: "BARF!!!!!!" })
-            .expect(201)
-            .then(response =>
-              expect(response.body.comment).to.contain.keys(
-                "author",
-                "article_id",
-                "votes",
-                "comment_id",
-                "body",
-                "created_at"
-              )
+    });
+    describe("/comments", () => {
+      it("POST status 201 responds with comment data", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({ username: "icellusedkars", body: "BARF!!!!!!" })
+          .expect(201)
+          .then(response =>
+            expect(response.body.comment).to.contain.keys(
+              "author",
+              "article_id",
+              "votes",
+              "comment_id",
+              "body",
+              "created_at"
+            )
+          );
+      });
+      it("POST with invalid body data returns 400 Bad Request", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({})
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal(
+              `null value in column "body" violates not-null constraint`
             );
-        });
-        it("POST with invalid body data returns 400 Bad Request", () => {
-          return request(app)
-            .post("/api/articles/1/comments")
-            .send({})
-            .expect(400)
-            .then(response => {
-              expect(response.body.msg).to.equal(
-                `null value in column "body" violates not-null constraint`
-              );
-            });
-        });
-        it("POST an invalid article_id returns 400 and error msg", () => {
-          return request(app)
-            .post("/api/articles/NOTaVALIDid/comments")
-            .send({ inc_votes: 22 })
-            .expect(400)
-            .then(response => {
-              expect(response.body.msg).to.equal(
-                `invalid input syntax for integer: "NOTaVALIDid"`
-              );
-            });
-        });
-        it("GET status 200 responds with comment data", () => {
-          return request(app)
-            .get("/api/articles/1/comments")
-            .expect(200)
-            .then(response =>
-              expect(response.body.comments[0]).to.contain.keys(
-                "author",
-                "article_id",
-                "votes",
-                "comment_id",
-                "body",
-                "created_at"
-              )
+          });
+      });
+      it("POST an invalid article_id returns 400 and error msg", () => {
+        return request(app)
+          .post("/api/articles/NOTaVALIDid/comments")
+          .send({ inc_votes: 22 })
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal(
+              `invalid input syntax for integer: "NOTaVALIDid"`
             );
-        });
-        it("comments are sorted in descending created_at order by default", () => {
-          return request(app)
-            .get("/api/articles/1/comments")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.descendingBy("created_at");
-            });
-        });
-        it("comments can be sorted by other columns when passed a valid column as a url sort_by query", () => {
-          return request(app)
-            .get("/api/articles/1/comments?sort_by=votes")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.descendingBy("votes");
-            });
-        });
-        it("comments can be ordered differently when passed an order query", () => {
-          return request(app)
-            .get("/api/articles/1/comments?sort_by=votes&order=asc")
-            .expect(200)
-            .then(res => {
-              expect(res.body.comments).to.be.ascendingBy("votes");
-            });
-        });
+          });
+      });
+      it("GET status 200 responds with comment data", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(response =>
+            expect(response.body.comments[0]).to.contain.keys(
+              "author",
+              "article_id",
+              "votes",
+              "comment_id",
+              "body",
+              "created_at"
+            )
+          );
+      });
+      it("comments are sorted in descending created_at order by default", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(res => {
+            expect(res.body.comments).to.be.descendingBy("created_at");
+          });
+      });
+      it("comments can be sorted by other columns when passed a valid column as a url sort_by query", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=votes")
+          .expect(200)
+          .then(res => {
+            expect(res.body.comments).to.be.descendingBy("votes");
+          });
+      });
+      it("comments can be ordered differently when passed an order query", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=votes&order=asc")
+          .expect(200)
+          .then(res => {
+            expect(res.body.comments).to.be.ascendingBy("votes");
+          });
+      });
+      it("400 Bad Request when passed an invalid order", () => {
+        return request(app)
+          .get("/api/articles/1/comments?order=NOTANORDER")
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal(`Bad Request`);
+          });
+      });
+      it("invalid sort_by query sent returns 400", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=NONSENSE")
+          .expect(400)
+          .then(res => {
+            expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
+          });
       });
     });
     describe("/comments/:comment_id", () => {
