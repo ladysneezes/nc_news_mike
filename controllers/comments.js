@@ -1,4 +1,8 @@
-const { updateComment, delComment } = require("../models/comments");
+const {
+  updateComment,
+  delComment,
+  checkComment
+} = require("../models/comments");
 
 exports.sendUpdatedComment = (req, res, next) => {
   updateComment(req.params, req.body)
@@ -14,9 +18,17 @@ exports.sendUpdatedComment = (req, res, next) => {
 };
 
 exports.deleteComment = (req, res, next) => {
-  delComment(req.params)
-    .then(deleted => {
-      return res.sendStatus(204);
+  checkComment(req.params)
+    .then(comment => {
+      if (comment.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No comment found for comment_id: ${req.params.comment_id}`
+        });
+      } else
+        delComment(req.params).then(deleted => {
+          return res.sendStatus(204);
+        });
     })
     .catch(next);
 };

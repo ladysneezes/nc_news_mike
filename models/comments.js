@@ -19,3 +19,9 @@ exports.delComment = ({ comment_id }) => {
     .where("comment_id", "=", comment_id)
     .del();
 };
+
+exports.checkComment = ({ comment_id }) => {
+  return connection("comments")
+    .select("comment_id")
+    .where("comment_id", "=", comment_id);
+};

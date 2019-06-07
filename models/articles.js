@@ -57,25 +57,22 @@ exports.fetchArticles = ({
   author = null,
   topic = null
 }) => {
-  console.log(author, "author in original model");
-  if (author) {
-    return fetchUserByUsername({ username: author });
-  } else if (order !== "desc" && order !== "asc") {
+  if (order !== "desc" && order !== "asc") {
     return Promise.reject({
       status: 400,
       msg: `Bad Request`
     });
-  } else;
-  return connection
-    .select("articles.*")
-    .from("articles")
-    .count({ comment_count: "comment_id" })
-    .leftJoin("comments", "comments.article_id", "articles.article_id")
-    .leftJoin("users", "users.username", "articles.author")
-    .groupBy("articles.article_id")
-    .orderBy(sort_by, order)
-    .modify(query => {
-      if (author) query.where("articles.author", "=", author);
-      if (topic) query.where("articles.topic", "=", topic);
-    });
+  } else
+    return connection
+      .select("articles.*")
+      .from("articles")
+      .count({ comment_count: "comment_id" })
+      .leftJoin("comments", "comments.article_id", "articles.article_id")
+      .leftJoin("users", "users.username", "articles.author")
+      .groupBy("articles.article_id")
+      .orderBy(sort_by, order)
+      .modify(query => {
+        if (author) query.where("articles.author", "=", author);
+        if (topic) query.where("articles.topic", "=", topic);
+      });
 };

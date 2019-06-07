@@ -7,6 +7,8 @@ const {
 } = require("../models/articles");
 
 exports.sendArticle = (req, res, next) => {
+  // check author exists
+  // check topic exists
   fetchArticleByArticleId(req.params)
     .then(article => {
       if (!article) {
@@ -35,7 +37,15 @@ exports.sendUpdatedArticle = (req, res, next) => {
 };
 
 exports.sendPostedComment = (req, res, next) => {
-  postComment(req.params, req.body)
+  fetchArticleByArticleId(req.params)
+    .then(article => {
+      if (!article) {
+        return Promise.reject({
+          status: 404,
+          msg: `No article found for article_id: ${req.params.article_id}`
+        });
+      } else return postComment(req.params, req.body);
+    })
     .then(([comment]) => {
       return res.status(201).send({ comment });
     })
@@ -43,7 +53,15 @@ exports.sendPostedComment = (req, res, next) => {
 };
 
 exports.sendComments = (req, res, next) => {
-  fetchCommentsByArticleId(req.params, req.query)
+  fetchArticleByArticleId(req.params)
+    .then(article => {
+      if (!article) {
+        return Promise.reject({
+          status: 404,
+          msg: `No article found for article_id: ${req.params.article_id}`
+        });
+      } else return fetchCommentsByArticleId(req.params, req.query);
+    })
     .then(comments => {
       return res.status(200).send({ comments });
     })

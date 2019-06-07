@@ -6,7 +6,7 @@ const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
 
-describe("/", () => {
+describe.only("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
@@ -140,7 +140,7 @@ describe("/", () => {
           .get("/api/articles?author=NOTANAUTHOR")
           .expect(400)
           .then(res => {
-            expect(res.body.msg).to.equal(``);
+            expect(res.body.msg).to.equal(`Bad request`);
           });
       });
     });
@@ -194,7 +194,7 @@ describe("/", () => {
             );
           });
       });
-      it.only("PATCH status 200 responds with updated article", () => {
+      it("PATCH status 200 responds with updated article", () => {
         return request(app)
           .patch("/api/articles/1")
           .send({ inc_votes: 22 })
@@ -243,7 +243,7 @@ describe("/", () => {
             expect(response.body.msg).to.equal("Bad Request");
           });
       });
-      it.only("PATCH with empty body data returns 200", () => {
+      it("PATCH with empty body data returns 200", () => {
         return request(app)
           .patch("/api/articles/1")
           .send({})
@@ -271,104 +271,134 @@ describe("/", () => {
             );
           });
       });
-    });
-    describe("/comments", () => {
-      it("POST status 201 responds with comment data", () => {
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send({ username: "icellusedkars", body: "BARF!!!!!!" })
-          .expect(201)
-          .then(response =>
-            expect(response.body.comment).to.contain.keys(
-              "author",
-              "article_id",
-              "votes",
-              "comment_id",
-              "body",
-              "created_at"
-            )
-          );
-      });
-      it("POST with invalid body data returns 400 Bad Request", () => {
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send({})
-          .expect(400)
-          .then(response => {
-            expect(response.body.msg).to.equal(
-              `null value in column "body" violates not-null constraint`
+      describe("/comments", () => {
+        it("POST status 201 responds with comment data", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({ username: "icellusedkars", body: "BARF!!!!!!" })
+            .expect(201)
+            .then(response =>
+              expect(response.body.comment).to.contain.keys(
+                "author",
+                "article_id",
+                "votes",
+                "comment_id",
+                "body",
+                "created_at"
+              )
             );
-          });
-      });
-      it("POST an invalid article_id returns 400 and error msg", () => {
-        return request(app)
-          .post("/api/articles/NOTaVALIDid/comments")
-          .send({ inc_votes: 22 })
-          .expect(400)
-          .then(response => {
-            expect(response.body.msg).to.equal(
-              `invalid input syntax for integer: "NOTaVALIDid"`
+        });
+        it("POST with invalid body data returns 400 Bad Request", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({ body: "BARF!!!!!!" })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                `null value in column "author" violates not-null constraint`
+              );
+            });
+        });
+        it("POST with missing body data returns 400 Bad Request", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({})
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                `null value in column "author" violates not-null constraint`
+              );
+            });
+        });
+        it("POST an invalid article_id returns 400 and error msg", () => {
+          return request(app)
+            .post("/api/articles/NOTaVALIDid/comments")
+            .send({ inc_votes: 22 })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                `invalid input syntax for integer: "NOTaVALIDid"`
+              );
+            });
+        });
+        it("POST a valid article_id that is not it use returns 404 and error msg", () => {
+          return request(app)
+            .post("/api/articles/100000/comments")
+            .send({ inc_votes: 22 })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                `No article found for article_id: 100000`
+              );
+            });
+        });
+        it("GET status 200 responds with comment data", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(response =>
+              expect(response.body.comments[0]).to.contain.keys(
+                "author",
+                "article_id",
+                "votes",
+                "comment_id",
+                "body",
+                "created_at"
+              )
             );
-          });
-      });
-      it("GET status 200 responds with comment data", () => {
-        return request(app)
-          .get("/api/articles/1/comments")
-          .expect(200)
-          .then(response =>
-            expect(response.body.comments[0]).to.contain.keys(
-              "author",
-              "article_id",
-              "votes",
-              "comment_id",
-              "body",
-              "created_at"
-            )
-          );
-      });
-      it("comments are sorted in descending created_at order by default", () => {
-        return request(app)
-          .get("/api/articles/1/comments")
-          .expect(200)
-          .then(res => {
-            expect(res.body.comments).to.be.descendingBy("created_at");
-          });
-      });
-      it("comments can be sorted by other columns when passed a valid column as a url sort_by query", () => {
-        return request(app)
-          .get("/api/articles/1/comments?sort_by=votes")
-          .expect(200)
-          .then(res => {
-            expect(res.body.comments).to.be.descendingBy("votes");
-          });
-      });
-      it("comments can be ordered differently when passed an order query", () => {
-        return request(app)
-          .get("/api/articles/1/comments?sort_by=votes&order=asc")
-          .expect(200)
-          .then(res => {
-            expect(res.body.comments).to.be.ascendingBy("votes");
-          });
-      });
-      it("400 Bad Request when passed an invalid order", () => {
-        return request(app)
-          .get("/api/articles/1/comments?order=NOTANORDER")
-          .expect(400)
-          .then(res => {
-            expect(res.body.msg).to.equal(`Bad Request`);
-          });
-      });
-      it("invalid sort_by query sent returns 400", () => {
-        return request(app)
-          .get("/api/articles/1/comments?sort_by=NONSENSE")
-          .expect(400)
-          .then(res => {
-            expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
-          });
+        });
+        it("comments are sorted in descending created_at order by default", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments).to.be.descendingBy("created_at");
+            });
+        });
+        it("comments can be sorted by other columns when passed a valid column as a url sort_by query", () => {
+          return request(app)
+            .get("/api/articles/1/comments?sort_by=votes")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments).to.be.descendingBy("votes");
+            });
+        });
+        it("comments can be ordered differently when passed an order query", () => {
+          return request(app)
+            .get("/api/articles/1/comments?sort_by=votes&order=asc")
+            .expect(200)
+            .then(res => {
+              expect(res.body.comments).to.be.ascendingBy("votes");
+            });
+        });
+        it("400 Bad Request when passed an invalid order", () => {
+          return request(app)
+            .get("/api/articles/1/comments?order=NOTANORDER")
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.equal(`Bad Request`);
+            });
+        });
+        it("invalid sort_by query sent returns 400", () => {
+          return request(app)
+            .get("/api/articles/1/comments?sort_by=NONSENSE")
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
+            });
+        });
+        // it.only("invalid sort_by query sent returns 400", () => {
+        //   return request(app)
+        //     .get("/api/articles/1000/comments")
+        //     .expect(404)
+        //     .then(res => {
+        //       expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
+        //     });
+        // });
       });
     });
     describe("/comments/:comment_id", () => {
-      it.only("PATCH status 200 responds with updated comment", () => {
+      it("PATCH status 200 responds with updated comment", () => {
         return request(app)
           .patch("/api/comments/1")
           .send({ inc_votes: 100 })
@@ -407,7 +437,7 @@ describe("/", () => {
             );
           });
       });
-      it.only("PATCH with invalid body data returns 400 Bad Request", () => {
+      it("PATCH with invalid body data returns 400 Bad Request", () => {
         return request(app)
           .patch("/api/comments/1")
           .send({ inc_votes: "NotAValidNumber" })
@@ -448,6 +478,16 @@ describe("/", () => {
         return request(app)
           .delete("/api/comments/1")
           .expect(204);
+      });
+      it("DELETE with comment_id not taken returns 404", () => {
+        return request(app)
+          .delete("/api/comments/1000")
+          .expect(404);
+      });
+      it("DELETE with invalid comment_id returns 400", () => {
+        return request(app)
+          .delete("/api/comments/NotAnId")
+          .expect(400);
       });
     });
   });
