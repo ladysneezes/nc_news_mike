@@ -43,3 +43,23 @@ exports.fetchCommentsByArticleId = (
     .where("article_id", "=", article_id)
     .orderBy(sort_by, order);
 };
+
+exports.fetchArticles = ({
+  sort_by = "created_at",
+  order = "desc",
+  author = null,
+  topic = null
+}) => {
+  return connection
+    .select("articles.*")
+    .from("articles")
+    .count({ comment_count: "comment_id" })
+    .leftJoin("comments", "comments.article_id", "articles.article_id")
+    .leftJoin("users", "users.username", "articles.author")
+    .groupBy("articles.article_id")
+    .orderBy(sort_by, order)
+    .modify(query => {
+      if (author) query.where("articles.author", "=", author);
+      if (topic) query.where("articles.topic", "=", topic);
+    });
+};

@@ -2,7 +2,8 @@ const {
   fetchArticleByArticleId,
   updateArticle,
   postComment,
-  fetchCommentsByArticleId
+  fetchCommentsByArticleId,
+  fetchArticles
 } = require("../models/articles");
 
 exports.sendArticle = (req, res, next) => {
@@ -34,13 +35,25 @@ exports.sendUpdatedArticle = (req, res, next) => {
 };
 
 exports.sendPostedComment = (req, res, next) => {
-  postComment(req.params, req.body).then(([comment]) => {
-    return res.status(201).send({ comment });
-  });
+  postComment(req.params, req.body)
+    .then(([comment]) => {
+      return res.status(201).send({ comment });
+    })
+    .catch(next);
 };
 
 exports.sendComments = (req, res, next) => {
-  fetchCommentsByArticleId(req.params, req.query).then(comments => {
-    return res.status(200).send({ comments });
-  });
+  fetchCommentsByArticleId(req.params, req.query)
+    .then(comments => {
+      return res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.sendArticles = (req, res, next) => {
+  fetchArticles(req.query)
+    .then(articles => {
+      return res.status(200).send({ articles });
+    })
+    .catch(next);
 };

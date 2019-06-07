@@ -4,8 +4,14 @@ const {
   sendArticle,
   sendUpdatedArticle,
   sendPostedComment,
-  sendComments
+  sendComments,
+  sendArticles
 } = require("../controllers/articles");
+
+articlesRouter
+  .route("/")
+  .get(sendArticles)
+  .all(methodNotAllowed);
 
 articlesRouter
   .route("/:article_id")
