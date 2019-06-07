@@ -8,7 +8,7 @@ exports.sendUpdatedComment = (req, res, next) => {
           status: 404,
           msg: `No comment found for comment_id: ${req.params.comment_id}`
         });
-      } else return res.status(201).send({ comment });
+      } else return res.status(200).send({ comment });
     })
     .catch(next);
 };

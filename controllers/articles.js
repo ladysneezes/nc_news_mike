@@ -29,7 +29,7 @@ exports.sendUpdatedArticle = (req, res, next) => {
           status: 404,
           msg: `No article found for article_id: ${req.params.article_id}`
         });
-      } else return res.status(201).send({ article });
+      } else return res.status(200).send({ article });
     })
     .catch(next);
 };

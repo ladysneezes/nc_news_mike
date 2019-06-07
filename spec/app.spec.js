@@ -47,7 +47,7 @@ describe("/", () => {
               expect(body.user.username).to.equal("icellusedkars");
             });
         });
-        it.only("GET for an unfound username - status:404 and error message", () => {
+        it("GET for an unfound username - status:404 and error message", () => {
           return request(app)
             .get("/api/users/notAnID")
             .expect(404)
@@ -194,11 +194,11 @@ describe("/", () => {
             );
           });
       });
-      it("PATCH status 201 responds with updated article", () => {
+      it.only("PATCH status 200 responds with updated article", () => {
         return request(app)
           .patch("/api/articles/1")
           .send({ inc_votes: 22 })
-          .expect(201)
+          .expect(200)
           .then(response => {
             expect(response.body.article).to.eql({
               article_id: 1,
@@ -243,7 +243,24 @@ describe("/", () => {
             expect(response.body.msg).to.equal("Bad Request");
           });
       });
-      it("PATCH with invalid body data returns 400 Bad Request", () => {
+      it.only("PATCH with empty body data returns 200", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({})
+          .expect(200)
+          .then(response => {
+            expect(response.body.article).to.eql({
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              body: "I find this existence challenging",
+              votes: 100,
+              topic: "mitch",
+              author: "butter_bridge",
+              created_at: "2018-11-15T12:21:54.171Z"
+            });
+          });
+      });
+      it("PATCH with empty body data returns 400 Bad Request", () => {
         return request(app)
           .patch("/api/articles/1")
           .send({ inc_votes: "NOTVALID" })
@@ -351,11 +368,11 @@ describe("/", () => {
       });
     });
     describe("/comments/:comment_id", () => {
-      it("PATCH status 201 responds with updated comment", () => {
+      it.only("PATCH status 200 responds with updated comment", () => {
         return request(app)
           .patch("/api/comments/1")
           .send({ inc_votes: 100 })
-          .expect(201)
+          .expect(200)
           .then(response => {
             expect(response.body.comment).to.eql({
               comment_id: 1,
@@ -390,13 +407,30 @@ describe("/", () => {
             );
           });
       });
-      it("PATCH with invalid body data returns 400 Bad Request", () => {
+      it.only("PATCH with invalid body data returns 400 Bad Request", () => {
         return request(app)
           .patch("/api/comments/1")
-          .send({})
+          .send({ inc_votes: "NotAValidNumber" })
           .expect(400)
           .then(response => {
             expect(response.body.msg).to.equal("Bad Request");
+          });
+      });
+      it("PATCH with empty body data returns 200 ", () => {
+        return request(app)
+          .patch("/api/comments/1")
+          .send({})
+          .expect(200)
+          .then(response => {
+            expect(response.body.comment).to.eql({
+              comment_id: 1,
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              author: "butter_bridge",
+              votes: 16,
+              article_id: 9,
+              created_at: "2017-11-22T12:36:03.389Z" //1970-01-01T00:00:00Z
+            });
           });
       });
       it("PATCH with invalid body data returns 400 Bad Request", () => {

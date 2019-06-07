@@ -14,8 +14,8 @@ exports.fetchArticleByArticleId = ({ article_id }) => {
     });
 };
 
-exports.updateArticle = ({ article_id }, { inc_votes }) => {
-  if (!inc_votes) {
+exports.updateArticle = ({ article_id }, { inc_votes = 0 }) => {
+  if (typeof inc_votes !== "number") {
     return Promise.reject({
       status: 400,
       msg: `Bad Request`
@@ -59,7 +59,7 @@ exports.fetchArticles = ({
 }) => {
   console.log(author, "author in original model");
   if (author) {
-    return fetchUserByUsername({ username: author }).then(console.log);
+    return fetchUserByUsername({ username: author });
   } else if (order !== "desc" && order !== "asc") {
     return Promise.reject({
       status: 400,
