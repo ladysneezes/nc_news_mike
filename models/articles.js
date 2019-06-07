@@ -59,7 +59,7 @@ exports.fetchArticles = ({
 }) => {
   console.log(author, "author in original model");
   if (author) {
-    return fetchUserByUsername({ username: author });
+    return fetchUserByUsername({ username: author }).then(console.log);
   } else if (order !== "desc" && order !== "asc") {
     return Promise.reject({
       status: 400,
