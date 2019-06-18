@@ -6,9 +6,11 @@ const {
   fetchArticles
 } = require("../models/articles");
 
+const { fetchUserByUsername } = require("../models/users");
+
+const { fetchTopicBySlug } = require("../models/topics");
+
 exports.sendArticle = (req, res, next) => {
-  // check author exists
-  // check topic exists
   fetchArticleByArticleId(req.params)
     .then(article => {
       if (!article) {
@@ -69,9 +71,57 @@ exports.sendComments = (req, res, next) => {
 };
 
 exports.sendArticles = (req, res, next) => {
+  console.log(req.query);
   fetchArticles(req.query)
     .then(articles => {
-      return res.status(200).send({ articles });
+      if (articles.length > 0) {
+        return res.status(200).send({ articles });
+      } else if (articles.length === 0 && req.query.username) {
+        return fetchUserByUsername({ username: req.query.author });
+      }
+    })
+    .then(user => {
+      if (!user) {
+        return Promise.reject({
+          status: 404,
+          msg: `Page not found`
+        });
+      }
+    })
+    .then(user => {
+      if (req.query.topic) fetchTopicBySlug({ slug: req.params.topic });
+      else return res.status(200).send({ articles: [] });
+    })
+    .then(topic => {
+      if (!topic) {
+        return Promise.reject({
+          status: 404,
+          msg: `Topic not found`
+        });
+      } else return res.status(200).send({ articles: [] });
     })
     .catch(next);
 };
+
+// exports.sendArticles = (req, res, next) => {
+//   if (req.query.author) {
+//     fetchUserByUsername({ username: req.query.author }).then(user => {
+//       if (!user) {
+//         return Promise.reject({
+//           status: 404,
+//           msg: `No username found for username: ${req.params.article_id}`
+//         });
+//       } else
+//         return fetchArticles(req.query)
+//           .then(articles => {
+//             return res.status(200).send({ articles });
+//           })
+//           .catch(next);
+//     });
+//   } else
+//     fetchArticles(req.query)
+//       .then(articles => {
+//         return res.status(200).send({ articles });
+//       })
+//       .catch(next);
+// };

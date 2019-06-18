@@ -9,7 +9,6 @@ const connection = require("../db/connection");
 describe.only("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-
   describe("/api", () => {
     it("GET status:200", () => {
       return request(app) //<<request here is the supertest object
@@ -19,7 +18,6 @@ describe.only("/", () => {
           expect(body.ok).to.equal(true); //<<expect here is from chai
         });
     });
-
     describe("/topics", () => {
       it("GET status 200 returns all topics", () => {
         return request(app)
@@ -60,13 +58,13 @@ describe.only("/", () => {
         });
       });
     });
-    describe("/articles", () => {
+    describe.only("/articles", () => {
       it("GET status 200", () => {
         return request(app)
           .get("/api/articles")
           .expect(200);
       });
-      it("returns all articles", () => {
+      it("GET returns all articles", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -83,7 +81,7 @@ describe.only("/", () => {
             );
           });
       });
-      it("sorts and orders by default to created_at and desc", () => {
+      it("GET sorts and orders by default to created_at and desc", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -91,7 +89,7 @@ describe.only("/", () => {
             expect(res.body.articles).to.be.descendingBy("created_at");
           });
       });
-      it("sorts and orders by querys provided", () => {
+      it("GET sorts and orders by querys provided", () => {
         return request(app)
           .get("/api/articles?sort_by=votes&order=asc")
           .expect(200)
@@ -99,7 +97,7 @@ describe.only("/", () => {
             expect(res.body.articles).to.be.ascendingBy("votes");
           });
       });
-      it("filters by author", () => {
+      it("GET filters by author", () => {
         return request(app)
           .get("/api/articles?author=rogersop")
           .expect(200)
@@ -109,7 +107,7 @@ describe.only("/", () => {
             });
           });
       });
-      it("filters by topic", () => {
+      it("GET filters by topic", () => {
         return request(app)
           .get("/api/articles?topic=mitch")
           .expect(200)
@@ -119,7 +117,7 @@ describe.only("/", () => {
             });
           });
       });
-      it("invalid sort_by query sent returns 400", () => {
+      it("GET invalid sort_by query sent returns 400", () => {
         return request(app)
           .get("/api/articles?sort_by=NONSENSE")
           .expect(400)
@@ -127,7 +125,7 @@ describe.only("/", () => {
             expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
           });
       });
-      it("invalid order query sent returns 400", () => {
+      it("GET invalid order query sent returns 400", () => {
         return request(app)
           .get("/api/articles?order=NotAnOrder")
           .expect(400)
@@ -135,12 +133,20 @@ describe.only("/", () => {
             expect(res.body.msg).to.equal(`Bad Request`);
           });
       });
-      it.only("none existent author sent order query sent returns 400", () => {
+      it("GET none existent author query sent returns 404", () => {
         return request(app)
           .get("/api/articles?author=NOTANAUTHOR")
-          .expect(400)
+          .expect(404)
           .then(res => {
-            expect(res.body.msg).to.equal(`Bad request`);
+            expect(res.body.msg).to.equal(`Username not found`);
+          });
+      });
+      it.only("GET none existent topic query sent returns 404", () => {
+        return request(app)
+          .get("/api/articles?topic=NOTATOPIC")
+          .expect(404)
+          .then(res => {
+            expect(res.body.msg).to.equal(`Page not found`);
           });
       });
     });
@@ -266,9 +272,7 @@ describe.only("/", () => {
           .send({ inc_votes: "NOTVALID" })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
-              `invalid input syntax for integer: "NaN"`
-            );
+            expect(response.body.msg).to.equal(`Bad Request`);
           });
       });
       describe("/comments", () => {
@@ -469,9 +473,7 @@ describe.only("/", () => {
           .send({ inc_votes: "NOTVALID" })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
-              `invalid input syntax for integer: "NaN"`
-            );
+            expect(response.body.msg).to.equal(`Bad Request`);
           });
       });
       it("DELETE returns 204 with no content", () => {
