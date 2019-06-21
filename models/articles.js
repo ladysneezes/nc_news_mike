@@ -23,7 +23,7 @@ exports.updateArticle = ({ article_id }, { inc_votes = 0 }) => {
   } else
     return connection("articles")
       .where("article_id", "=", article_id)
-      .increment("votes", inc_votes)
+      .increment("votes", inc_votes || 0)
       .returning("*")
       .then(([article]) => article);
 };
@@ -75,4 +75,30 @@ exports.fetchArticles = ({
         if (author) query.where("articles.author", "=", author);
         if (topic) query.where("articles.topic", "=", topic);
       });
+};
+
+exports.checkExists = ({ topic, author }, res, next) => {
+  if (topic) {
+    return connection("topics")
+      .select("*")
+      .where({ slug: topic })
+      .then(response => {
+        if (response.length === 0) {
+          return { msg: `${topic} does not exist as a topic` };
+        }
+        return true;
+      });
+  }
+  if (author) {
+    return connection("users")
+      .select("*")
+      .where({ username: author })
+      .then(response => {
+        if (response.length === 0) {
+          return { msg: `Author ${author} does not exist` };
+        }
+        return true;
+      });
+  }
+  return true;
 };

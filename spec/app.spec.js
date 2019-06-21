@@ -58,7 +58,7 @@ describe.only("/", () => {
         });
       });
     });
-    describe.only("/articles", () => {
+    describe("/articles", () => {
       it("GET status 200", () => {
         return request(app)
           .get("/api/articles")
@@ -138,15 +138,17 @@ describe.only("/", () => {
           .get("/api/articles?author=NOTANAUTHOR")
           .expect(404)
           .then(res => {
-            expect(res.body.msg).to.equal(`Username not found`);
+            expect(res.body.msg).to.equal(`Author NOTANAUTHOR does not exist`);
           });
       });
-      it.only("GET none existent topic query sent returns 404", () => {
+      it("GET none existent topic query sent returns 404", () => {
         return request(app)
           .get("/api/articles?topic=NOTATOPIC")
           .expect(404)
           .then(res => {
-            expect(res.body.msg).to.equal(`Page not found`);
+            expect(res.body.msg).to.equal(
+              `NOTATOPIC does not exist as a topic`
+            );
           });
       });
     });
@@ -240,13 +242,21 @@ describe.only("/", () => {
             );
           });
       });
-      it("PATCH with invalid body data returns 400 Bad Request", () => {
+      it("PATCH with empty body data returns 200 and does not increment", () => {
         return request(app)
           .patch("/api/articles/1")
           .send({})
-          .expect(400)
+          .expect(200)
           .then(response => {
-            expect(response.body.msg).to.equal("Bad Request");
+            expect(response.body.article).to.eql({
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              created_at: "2018-11-15T12:21:54.171Z",
+              votes: 100
+            });
           });
       });
       it("PATCH with empty body data returns 200", () => {
