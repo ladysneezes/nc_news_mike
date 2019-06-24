@@ -7,10 +7,6 @@ const {
   checkExists
 } = require("../models/articles");
 
-const { fetchUserByUsername } = require("../models/users");
-
-const { fetchTopicBySlug } = require("../models/topics");
-
 exports.sendArticle = (req, res, next) => {
   fetchArticleByArticleId(req.params)
     .then(article => {
@@ -82,35 +78,3 @@ exports.sendArticles = (req, res, next) => {
     })
     .catch(next);
 };
-
-// exports.sendArticles = (req, res, next) => {
-//   fetchArticles(req.query)
-//     .then(articles => {
-//       if (articles.length > 0) {
-//         return res.status(200).send({ articles });
-//       } else if (articles.length === 0 && req.query.username) {
-//         return fetchUserByUsername({ username: req.query.author });
-//       }
-//     })
-//     .then(user => {
-//       if (!user) {
-//         return Promise.reject({
-//           status: 404,
-//           msg: `Page not found`
-//         });
-//       }
-//     })
-//     .then(user => {
-//       if (req.query.topic) fetchTopicBySlug({ slug: req.params.topic });
-//       else return res.status(200).send({ articles: [] });
-//     })
-//     .then(topic => {
-//       if (!topic) {
-//         return Promise.reject({
-//           status: 404,
-//           msg: `Topic not found`
-//         });
-//       } else return res.status(200).send({ articles: [] });
-//     })
-//     .catch(next);
-// };

@@ -5,17 +5,18 @@ chai.use(require("chai-sorted"));
 const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
+const endpoints = require("../endpoints");
 
 describe.only("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-  describe("/api", () => {
-    it("GET status:200", () => {
+  describe.only("/api", () => {
+    it("GET status:200 returns endpoints", () => {
       return request(app) //<<request here is the supertest object
         .get("/api")
         .expect(200)
         .then(({ body }) => {
-          expect(body.ok).to.equal(true); //<<expect here is from chai
+          expect(body.endpoints).to.eql(endpoints); //<<expect here is from chai
         });
     });
     describe("/topics", () => {
