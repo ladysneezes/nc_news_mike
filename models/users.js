@@ -9,3 +9,7 @@ exports.fetchUserByUsername = ({ username }) => {
       return user;
     });
 };
+
+exports.fetchAllUsers = () => {
+  return connection.select("*").from("users");
+};

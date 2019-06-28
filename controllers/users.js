@@ -15,3 +15,11 @@ exports.sendUser = (req, res, next) => {
       next(err);
     });
 };
+
+exports.sendUsers = (req, res, next) => {
+  fetchAllUsers()
+    .then(users => res.status(200).send({ users }))
+    .catch(err => {
+      next(err);
+    });
+};
