@@ -31,6 +31,17 @@ describe.only("/", () => {
       });
     });
     describe("/users", () => {
+      describe.only("/", () => {
+        it("GET status 200 returns all users", () => {
+          return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.users).to.be.an("array");
+              // expect(body.topics[0]).to.contain.keys("description", "slug");
+            });
+        });
+      });
       describe("/:username", () => {
         it("GET status 200 returns user", () => {
           return request(app)
