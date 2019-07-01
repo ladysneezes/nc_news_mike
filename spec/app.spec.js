@@ -31,7 +31,7 @@ describe.only("/", () => {
       });
     });
     describe("/users", () => {
-      describe.only("/", () => {
+      describe("/", () => {
         it("GET status 200 returns all users", () => {
           return request(app)
             .get("/api/users")
@@ -160,6 +160,55 @@ describe.only("/", () => {
           .then(res => {
             expect(res.body.msg).to.equal(
               `NOTATOPIC does not exist as a topic`
+            );
+          });
+      });
+      it("POST status 201 responds with article data", () => {
+        return request(app)
+          .post("/api/articles/")
+          .send({
+            title: "icellusedkars",
+            body: "example body",
+            topic: "mitch",
+            author: "icellusedkars"
+          })
+          .expect(201)
+          .then(response =>
+            expect(response.body.article).to.contain.keys(
+              "author",
+              "article_id",
+              "votes",
+              "title",
+              "body",
+              "created_at",
+              "topic"
+            )
+          );
+      });
+      it("POST with invalid body data returns 400 Bad Request", () => {
+        return request(app)
+          .post("/api/articles/")
+          .send({
+            title: "icellusedkars",
+            body: "example body",
+            author: "icellusedkars",
+            topic: "notatopic"
+          })
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal(
+              `insert or update on table "articles" violates foreign key constraint "articles_topic_foreign"`
+            );
+          });
+      });
+      it("POST with missing body data returns 400 Bad Request", () => {
+        return request(app)
+          .post("/api/articles/")
+          .send({})
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal(
+              `null value in column "title" violates not-null constraint`
             );
           });
       });

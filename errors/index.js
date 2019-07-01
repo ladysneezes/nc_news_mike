@@ -12,7 +12,7 @@ exports.handle500 = (err, req, res, next) => {
   res.status(500).send({ msg: "Internal Server Error" });
 };
 exports.handlePsqlCodes = (err, req, res, next) => {
-  const psqlCodes = ["22P02", "23502", "42703"];
+  const psqlCodes = ["22P02", "23502", "42703", "23503"];
   if (psqlCodes.includes(err.code)) {
     res.status(400).send({ msg: err.message.split(" - ")[1] || "Bad Request" });
   } else next(err);

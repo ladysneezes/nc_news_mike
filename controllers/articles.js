@@ -4,7 +4,8 @@ const {
   postComment,
   fetchCommentsByArticleId,
   fetchArticles,
-  checkExists
+  checkExists,
+  postArticle
 } = require("../models/articles");
 
 exports.sendArticle = (req, res, next) => {
@@ -75,6 +76,14 @@ exports.sendArticles = (req, res, next) => {
       } else {
         next({ status: 404, msg: exists.msg });
       }
+    })
+    .catch(next);
+};
+
+exports.sendPostedArticle = (req, res, next) => {
+  postArticle(req.body)
+    .then(([article]) => {
+      return res.status(201).send({ article });
     })
     .catch(next);
 };

@@ -5,12 +5,14 @@ const {
   sendUpdatedArticle,
   sendPostedComment,
   sendComments,
-  sendArticles
+  sendArticles,
+  sendPostedArticle
 } = require("../controllers/articles");
 
 articlesRouter
   .route("/")
   .get(sendArticles)
+  .post(sendPostedArticle)
   .all(methodNotAllowed);
 
 articlesRouter

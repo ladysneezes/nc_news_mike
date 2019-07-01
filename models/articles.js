@@ -102,3 +102,9 @@ exports.checkExists = ({ topic, author }, res, next) => {
   }
   return true;
 };
+
+exports.postArticle = ({ body, author, topic, title }) => {
+  return connection("articles")
+    .insert({ author, body, title, topic })
+    .returning("*");
+};
