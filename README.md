@@ -8,10 +8,10 @@ Hosted: https://mikes-nc-news.herokuapp.com/
 
 ### Prerequisites
 
-- node version 10
+- node version 12
 - PostgreSQL version 11
 - npm version 6
-- API Testing tool (Insomnia, Postman, etc.)
+- API Testing tool (e.g. Insomnia)
 
 ### Installation
 
@@ -141,7 +141,7 @@ Note: GET request can be ran from a browser using "localhost:9090" before an end
         "votes",
         "topic",
         "author",
-        "created_At",
+        "created_at",
         "comment_count"
       ],
       "ORDER": ["asc", "desc"]
