@@ -32,7 +32,7 @@ describe("/utils", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
-          created_at: "Thu Nov 15 2018 12:21:54 GMT+0000 (Greenwich Mean Time)",
+          created_at: new Date(1542284514171), // YYYY - MM - DDTHH: mm: ss.sssZ
           votes: 100
         }
       ];
@@ -63,7 +63,7 @@ describe("/utils", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
-          created_at: "Thu Nov 15 2018 12:21:54 GMT+0000 (Greenwich Mean Time)",
+          created_at: new Date(1542284514171),
           votes: 100
         },
         {
@@ -71,7 +71,7 @@ describe("/utils", () => {
           topic: "mitch",
           author: "icellusedkars",
           body: "Call me Mitchell.",
-          created_at: "Sun Nov 16 2014 12:21:54 GMT+0000 (Greenwich Mean Time)"
+          created_at: new Date(1416140514171)
         }
       ];
       expect(actual[0]).to.not.equal(expected[0]);
