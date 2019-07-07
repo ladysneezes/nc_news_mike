@@ -443,7 +443,7 @@ describe("/", () => {
             .get("/api/articles/1/comments")
             .expect(200)
             .then(res => {
-              const { comments } = response.body;
+              const { comments } = res.body;
               expect(comments).to.be.descendingBy("created_at");
             });
         });
@@ -452,7 +452,7 @@ describe("/", () => {
             .get("/api/articles/1/comments?sort_by=votes")
             .expect(200)
             .then(res => {
-              const { comments } = response.body;
+              const { comments } = res.body;
               expect(comments).to.be.descendingBy("votes");
             });
         });
@@ -461,7 +461,7 @@ describe("/", () => {
             .get("/api/articles/1/comments?sort_by=votes&order=asc")
             .expect(200)
             .then(res => {
-              const { comments } = response.body;
+              const { comments } = res.body;
               expect(comments).to.be.ascendingBy("votes");
             });
         });
