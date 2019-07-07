@@ -7,10 +7,10 @@ const app = require("../app");
 const connection = require("../db/connection");
 const endpoints = require("../endpoints");
 
-describe.only("/", () => {
+describe("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-  describe.only("/api", () => {
+  describe("/api", () => {
     it("GET status:200 returns endpoints", () => {
       return request(app) //<<request here is the supertest object
         .get("/api")
@@ -462,14 +462,6 @@ describe.only("/", () => {
               expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
             });
         });
-        // it.only("invalid sort_by query sent returns 400", () => {
-        //   return request(app)
-        //     .get("/api/articles/1000/comments")
-        //     .expect(404)
-        //     .then(res => {
-        //       expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
-        //     });
-        // });
       });
     });
     describe("/comments/:comment_id", () => {
