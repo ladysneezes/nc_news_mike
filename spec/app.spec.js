@@ -12,11 +12,11 @@ describe("/", () => {
   after(() => connection.destroy());
   describe("/api", () => {
     it("GET status:200 returns endpoints", () => {
-      return request(app) //<<request here is the supertest object
+      return request(app)
         .get("/api")
         .expect(200)
         .then(({ body }) => {
-          expect(body.endpoints).to.eql(endpoints); //<<expect here is from chai
+          expect(body.endpoints).to.eql(endpoints);
         });
     });
     describe("/topics", () => {
@@ -25,8 +25,9 @@ describe("/", () => {
           .get("/api/topics")
           .expect(200)
           .then(({ body }) => {
-            expect(body.topics).to.be.an("array");
-            expect(body.topics[0]).to.contain.keys("description", "slug");
+            const { topics } = body;
+            expect(topics).to.be.an("array");
+            expect(topics[0]).to.contain.keys("description", "slug");
           });
       });
     });
@@ -37,8 +38,8 @@ describe("/", () => {
             .get("/api/users")
             .expect(200)
             .then(({ body }) => {
-              expect(body.users).to.be.an("array");
-              // expect(body.topics[0]).to.contain.keys("description", "slug");
+              const { users } = body;
+              expect(users).to.be.an("array");
             });
         });
       });
@@ -48,13 +49,10 @@ describe("/", () => {
             .get("/api/users/icellusedkars")
             .expect(200)
             .then(({ body }) => {
-              expect(body.user).to.be.an("object");
-              expect(body.user).to.contain.keys(
-                "username",
-                "avatar_url",
-                "name"
-              );
-              expect(body.user.username).to.equal("icellusedkars");
+              const { user } = body;
+              expect(user).to.be.an("object");
+              expect(user).to.contain.keys("username", "avatar_url", "name");
+              expect(user.username).to.equal("icellusedkars");
             });
         });
         it("GET for an unfound username - status:404 and error message", () => {
@@ -62,10 +60,9 @@ describe("/", () => {
             .get("/api/users/notAnID")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal(
-                `No user found for username: notAnID`
-              );
-              expect(response.statusCode).to.equal(404);
+              const { body, statusCode } = response;
+              expect(body.msg).to.equal(`No user found for username: notAnID`);
+              expect(statusCode).to.equal(404);
             });
         });
       });
@@ -81,8 +78,9 @@ describe("/", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.an("array");
-            expect(body.articles[0]).to.contain.keys(
+            const { articles } = body;
+            expect(articles).to.be.an("array");
+            expect(articles[0]).to.contain.keys(
               "author",
               "title",
               "article_id",
@@ -98,7 +96,8 @@ describe("/", () => {
           .get("/api/articles")
           .expect(200)
           .then(res => {
-            expect(res.body.articles).to.be.descendingBy("created_at");
+            const { articles } = res.body;
+            expect(articles).to.be.descendingBy("created_at");
           });
       });
       it("GET sorts and orders by querys provided", () => {
@@ -106,7 +105,8 @@ describe("/", () => {
           .get("/api/articles?sort_by=votes&order=asc")
           .expect(200)
           .then(res => {
-            expect(res.body.articles).to.be.ascendingBy("votes");
+            const { articles } = res.body;
+            expect(articles).to.be.ascendingBy("votes");
           });
       });
       it("GET filters by author", () => {
@@ -114,7 +114,8 @@ describe("/", () => {
           .get("/api/articles?author=rogersop")
           .expect(200)
           .then(res => {
-            res.body.articles.forEach(article => {
+            const { articles } = res.body;
+            articles.forEach(article => {
               expect(article.author).to.equal("rogersop");
             });
           });
@@ -124,7 +125,8 @@ describe("/", () => {
           .get("/api/articles?topic=mitch")
           .expect(200)
           .then(res => {
-            res.body.articles.forEach(article => {
+            const { articles } = res.body;
+            articles.forEach(article => {
               expect(article.topic).to.equal("mitch");
             });
           });
@@ -134,7 +136,8 @@ describe("/", () => {
           .get("/api/articles?sort_by=NONSENSE")
           .expect(400)
           .then(res => {
-            expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
+            const { msg } = res.body;
+            expect(msg).to.equal(`column "NONSENSE" does not exist`);
           });
       });
       it("GET invalid order query sent returns 400", () => {
@@ -142,7 +145,8 @@ describe("/", () => {
           .get("/api/articles?order=NotAnOrder")
           .expect(400)
           .then(res => {
-            expect(res.body.msg).to.equal(`Bad Request`);
+            const { msg } = res.body;
+            expect(msg).to.equal(`Bad Request`);
           });
       });
       it("GET none existent author query sent returns 404", () => {
@@ -150,7 +154,8 @@ describe("/", () => {
           .get("/api/articles?author=NOTANAUTHOR")
           .expect(404)
           .then(res => {
-            expect(res.body.msg).to.equal(`Author NOTANAUTHOR does not exist`);
+            const { msg } = res.body;
+            expect(msg).to.equal(`Author NOTANAUTHOR does not exist`);
           });
       });
       it("GET none existent topic query sent returns 404", () => {
@@ -158,9 +163,8 @@ describe("/", () => {
           .get("/api/articles?topic=NOTATOPIC")
           .expect(404)
           .then(res => {
-            expect(res.body.msg).to.equal(
-              `NOTATOPIC does not exist as a topic`
-            );
+            const { msg } = res.body;
+            expect(msg).to.equal(`NOTATOPIC does not exist as a topic`);
           });
       });
       it("POST status 201 responds with article data", () => {
@@ -173,8 +177,9 @@ describe("/", () => {
             author: "icellusedkars"
           })
           .expect(201)
-          .then(response =>
-            expect(response.body.article).to.contain.keys(
+          .then(response => {
+            const { article } = response.body;
+            expect(article).to.contain.keys(
               "author",
               "article_id",
               "votes",
@@ -182,8 +187,8 @@ describe("/", () => {
               "body",
               "created_at",
               "topic"
-            )
-          );
+            );
+          });
       });
       it("POST with invalid body data returns 400 Bad Request", () => {
         return request(app)
@@ -196,7 +201,8 @@ describe("/", () => {
           })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
+            const { msg } = response.body;
+            expect(msg).to.equal(
               `insert or update on table "articles" violates foreign key constraint "articles_topic_foreign"`
             );
           });
@@ -207,7 +213,8 @@ describe("/", () => {
           .send({})
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
+            const { msg } = response.body;
+            expect(msg).to.equal(
               `null value in column "title" violates not-null constraint`
             );
           });
@@ -219,8 +226,9 @@ describe("/", () => {
           .get("/api/articles/1")
           .expect(200)
           .then(({ body }) => {
-            expect(body.article).to.be.an("object");
-            expect(body.article).to.contain.keys(
+            const { article } = body;
+            expect(article).to.be.an("object");
+            expect(article).to.contain.keys(
               "author",
               "title",
               "article_id",
@@ -230,7 +238,7 @@ describe("/", () => {
               "votes",
               "comment_count"
             );
-            expect(body.article).to.eql({
+            expect(article).to.eql({
               author: "butter_bridge",
               title: "Living in the shadow of a great man",
               article_id: 1,
@@ -247,10 +255,9 @@ describe("/", () => {
           .get("/api/articles/9999")
           .expect(404)
           .then(response => {
-            expect(response.body.msg).to.equal(
-              `No article found for article_id: 9999`
-            );
-            expect(response.statusCode).to.equal(404);
+            const { body, statusCode } = response;
+            expect(body.msg).to.equal(`No article found for article_id: 9999`);
+            expect(statusCode).to.equal(404);
           });
       });
       it("GET an invalid article_id returns 400 and error msg", () => {
@@ -258,7 +265,8 @@ describe("/", () => {
           .get("/api/articles/invalidID")
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
+            const { msg } = response.body;
+            expect(msg).to.equal(
               `invalid input syntax for integer: "invalidID"`
             );
           });
@@ -269,7 +277,8 @@ describe("/", () => {
           .send({ inc_votes: 22 })
           .expect(200)
           .then(response => {
-            expect(response.body.article).to.eql({
+            const { article } = response.body;
+            expect(article).to.eql({
               article_id: 1,
               title: "Living in the shadow of a great man",
               body: "I find this existence challenging",
@@ -286,10 +295,9 @@ describe("/", () => {
           .send({ inc_votes: 22 })
           .expect(404)
           .then(response => {
-            expect(response.body.msg).to.equal(
-              `No article found for article_id: 9999`
-            );
-            expect(response.statusCode).to.equal(404);
+            const { body, statusCode } = response;
+            expect(body.msg).to.equal(`No article found for article_id: 9999`);
+            expect(statusCode).to.equal(404);
           });
       });
       it("PATCH an invalid article_id returns 400 and error msg", () => {
@@ -298,7 +306,8 @@ describe("/", () => {
           .send({ inc_votes: 22 })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
+            const { msg } = response.body;
+            expect(msg).to.equal(
               `invalid input syntax for integer: "invalidID"`
             );
           });
@@ -309,7 +318,8 @@ describe("/", () => {
           .send({})
           .expect(200)
           .then(response => {
-            expect(response.body.article).to.eql({
+            const { article } = response.body;
+            expect(article).to.eql({
               article_id: 1,
               title: "Living in the shadow of a great man",
               topic: "mitch",
@@ -326,7 +336,8 @@ describe("/", () => {
           .send({})
           .expect(200)
           .then(response => {
-            expect(response.body.article).to.eql({
+            const { article } = response.body;
+            expect(article).to.eql({
               article_id: 1,
               title: "Living in the shadow of a great man",
               body: "I find this existence challenging",
@@ -343,7 +354,8 @@ describe("/", () => {
           .send({ inc_votes: "NOTVALID" })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(`Bad Request`);
+            const { msg } = response.body;
+            expect(msg).to.equal(`Bad Request`);
           });
       });
       describe("/comments", () => {
@@ -352,16 +364,17 @@ describe("/", () => {
             .post("/api/articles/1/comments")
             .send({ username: "icellusedkars", body: "BARF!!!!!!" })
             .expect(201)
-            .then(response =>
-              expect(response.body.comment).to.contain.keys(
+            .then(response => {
+              const { comment } = response.body;
+              expect(comment).to.contain.keys(
                 "author",
                 "article_id",
                 "votes",
                 "comment_id",
                 "body",
                 "created_at"
-              )
-            );
+              );
+            });
         });
         it("POST with invalid body data returns 400 Bad Request", () => {
           return request(app)
@@ -369,7 +382,8 @@ describe("/", () => {
             .send({ body: "BARF!!!!!!" })
             .expect(400)
             .then(response => {
-              expect(response.body.msg).to.equal(
+              const { msg } = response.body;
+              expect(msg).to.equal(
                 `null value in column "author" violates not-null constraint`
               );
             });
@@ -380,7 +394,8 @@ describe("/", () => {
             .send({})
             .expect(400)
             .then(response => {
-              expect(response.body.msg).to.equal(
+              const { msg } = response.body;
+              expect(msg).to.equal(
                 `null value in column "author" violates not-null constraint`
               );
             });
@@ -391,7 +406,8 @@ describe("/", () => {
             .send({ inc_votes: 22 })
             .expect(400)
             .then(response => {
-              expect(response.body.msg).to.equal(
+              const { msg } = response.body;
+              expect(msg).to.equal(
                 `invalid input syntax for integer: "NOTaVALIDid"`
               );
             });
@@ -402,32 +418,33 @@ describe("/", () => {
             .send({ inc_votes: 22 })
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal(
-                `No article found for article_id: 100000`
-              );
+              const { msg } = response.body;
+              expect(msg).to.equal(`No article found for article_id: 100000`);
             });
         });
         it("GET status 200 responds with comment data", () => {
           return request(app)
             .get("/api/articles/1/comments")
             .expect(200)
-            .then(response =>
-              expect(response.body.comments[0]).to.contain.keys(
+            .then(response => {
+              const { comments } = response.body;
+              expect(comments[0]).to.contain.keys(
                 "author",
                 "article_id",
                 "votes",
                 "comment_id",
                 "body",
                 "created_at"
-              )
-            );
+              );
+            });
         });
         it("comments are sorted in descending created_at order by default", () => {
           return request(app)
             .get("/api/articles/1/comments")
             .expect(200)
             .then(res => {
-              expect(res.body.comments).to.be.descendingBy("created_at");
+              const { comments } = response.body;
+              expect(comments).to.be.descendingBy("created_at");
             });
         });
         it("comments can be sorted by other columns when passed a valid column as a url sort_by query", () => {
@@ -435,7 +452,8 @@ describe("/", () => {
             .get("/api/articles/1/comments?sort_by=votes")
             .expect(200)
             .then(res => {
-              expect(res.body.comments).to.be.descendingBy("votes");
+              const { comments } = response.body;
+              expect(comments).to.be.descendingBy("votes");
             });
         });
         it("comments can be ordered differently when passed an order query", () => {
@@ -443,7 +461,8 @@ describe("/", () => {
             .get("/api/articles/1/comments?sort_by=votes&order=asc")
             .expect(200)
             .then(res => {
-              expect(res.body.comments).to.be.ascendingBy("votes");
+              const { comments } = response.body;
+              expect(comments).to.be.ascendingBy("votes");
             });
         });
         it("400 Bad Request when passed an invalid order", () => {
@@ -451,7 +470,8 @@ describe("/", () => {
             .get("/api/articles/1/comments?order=NOTANORDER")
             .expect(400)
             .then(res => {
-              expect(res.body.msg).to.equal(`Bad Request`);
+              const { msg } = res.body;
+              expect(msg).to.equal(`Bad Request`);
             });
         });
         it("invalid sort_by query sent returns 400", () => {
@@ -459,7 +479,8 @@ describe("/", () => {
             .get("/api/articles/1/comments?sort_by=NONSENSE")
             .expect(400)
             .then(res => {
-              expect(res.body.msg).to.equal(`column "NONSENSE" does not exist`);
+              const { msg } = res.body;
+              expect(msg).to.equal(`column "NONSENSE" does not exist`);
             });
         });
       });
@@ -471,7 +492,8 @@ describe("/", () => {
           .send({ inc_votes: 100 })
           .expect(200)
           .then(response => {
-            expect(response.body.comment).to.eql({
+            const { comment } = response.body;
+            expect(comment).to.eql({
               comment_id: 1,
               body:
                 "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
@@ -488,9 +510,8 @@ describe("/", () => {
           .send({ inc_votes: 100 })
           .expect(404)
           .then(response => {
-            expect(response.body.msg).to.equal(
-              `No comment found for comment_id: 9999`
-            );
+            const { msg } = response.body;
+            expect(msg).to.equal(`No comment found for comment_id: 9999`);
           });
       });
       it("PATCH an invalid comment_id returns 400 and error msg", () => {
@@ -499,7 +520,8 @@ describe("/", () => {
           .send({ inc_votes: 100 })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(
+            const { msg } = response.body;
+            expect(msg).to.equal(
               `invalid input syntax for integer: "invalidID"`
             );
           });
@@ -510,7 +532,8 @@ describe("/", () => {
           .send({ inc_votes: "NotAValidNumber" })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal("Bad Request");
+            const { msg } = response.body;
+            expect(msg).to.equal("Bad Request");
           });
       });
       it("PATCH with empty body data returns 200 ", () => {
@@ -519,7 +542,8 @@ describe("/", () => {
           .send({})
           .expect(200)
           .then(response => {
-            expect(response.body.comment).to.eql({
+            const { comment } = response.body;
+            expect(comment).to.eql({
               comment_id: 1,
               body:
                 "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
@@ -536,7 +560,8 @@ describe("/", () => {
           .send({ inc_votes: "NOTVALID" })
           .expect(400)
           .then(response => {
-            expect(response.body.msg).to.equal(`Bad Request`);
+            const { msg } = response.body;
+            expect(msg).to.equal(`Bad Request`);
           });
       });
       it("DELETE returns 204 with no content", () => {
