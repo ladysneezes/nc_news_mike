@@ -29,15 +29,18 @@ exports.seed = (knex, Promise) => {
         .returning("*");
     })
     .then(articleData => {
-      return createLookupObj(articleData, "title", "article_id");
-    })
-    .then(lookupObj => {
-      return linkKeys(comments, lookupObj, "belongs_to", "article_id");
-    })
-    .then(commentsWithArtId => {
-      return renameKeys(commentsWithArtId, "created_by", "author");
-    })
-    .then(commentsWithAuthor => {
+      const lookupObj = createLookupObj(articleData, "title", "article_id");
+      const commentsWithArtId = linkKeys(
+        comments,
+        lookupObj,
+        "belongs_to",
+        "article_id"
+      );
+      const commentsWithAuthor = renameKeys(
+        commentsWithArtId,
+        "created_by",
+        "author"
+      );
       return knex
         .insert(timestampToDate(commentsWithAuthor))
         .into("comments")
