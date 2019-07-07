@@ -14,16 +14,16 @@ const timestampToDate = articleData => {
 };
 
 const renameKeys = (anArray, oldName, newName) => {
-  const answers = [...anArray];
+  const updatedKeys = [...anArray];
   if (oldName && newName) {
-    answers.forEach(answer => {
-      if (answer.hasOwnProperty(oldName)) {
-        answer[newName] = answer[oldName];
-        delete answer[oldName];
+    updatedKeys.forEach(key => {
+      if (key.hasOwnProperty(oldName)) {
+        key[newName] = key[oldName];
+        delete key[oldName];
       }
     });
   }
-  return answers;
+  return updatedKeys;
 };
 
 const createLookupObj = (refDataArray, key, value) => {
