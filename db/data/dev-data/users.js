@@ -3,7 +3,7 @@ module.exports = [
     username: "tickle122",
     name: "Tom Tickle",
     avatar_url:
-      "https://www.spiritsurfers.net/monastery/wp-content/uploads/_41500270_mrtickle.jpg"
+      "https://i1.wp.com/metro.co.uk/wp-content/uploads/2014/03/wpid-article-1312912102057-0d5dc73100000578-807569_636x482.jpg?quality=90&strip=all&zoom=1&resize=540%2C409"
   },
   {
     username: "grumpy19",
@@ -19,13 +19,14 @@ module.exports = [
   {
     username: "cooljmessy",
     name: "Peter Messy",
-    avatar_url: "https://i.imgur.com/WfX0Neu.jpg"
+    avatar_url:
+      "https://vignette.wikia.nocookie.net/mrmen/images/1/1a/MR_MESSY_4A.jpg/revision/latest/scale-to-width-down/250?cb=20170730171002"
   },
   {
     username: "weegembump",
     name: "Gemma Bump",
     avatar_url:
-      "https://www.upandrunning.co.uk/media/catalog/product/cache/1/image/650x/040ec09b1e35df139433887a97daa66f/m/r/mr-bump.jpg"
+      "https://cdn.shopify.com/s/files/1/0194/0815/8819/t/2/assets/cp-square-mr-bump.jpg?21857"
   },
   {
     username: "jessjelly",
