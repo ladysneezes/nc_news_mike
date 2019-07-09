@@ -14,8 +14,6 @@ app.use(cors());
 app.use(express.json());
 app.use("/api", apiRouter);
 
-//app.all("/*", routeNotFound);
-
 app.use(handleCustomErrors);
 app.use(handlePsqlCodes);
 app.use(handle500);
