@@ -2,7 +2,7 @@
 
 NC News is a web application designed to act as a repository for news articles. The relational database stores the Articles, Comments, Topics, and Users.
 
-Hosted: https://mikes-nc-news.herokuapp.com/
+Hosted: https://mikes-nc-news.herokuapp.com/api
 
 ## Getting Started
 
@@ -397,10 +397,6 @@ npm test
 ### Author
 
 Mike Frank (ladysneezes)
-
-### Acknowledgements
-
-# nc-news-mike
 
 ## Available Scripts
 
