@@ -8,7 +8,8 @@ module.exports = [
   {
     username: "grumpy19",
     name: "Paul Grump",
-    avatar_url: "https://www.tumbit.com/profile-image/4/original/mr-grumpy.jpg"
+    avatar_url:
+      "https://vignette.wikia.nocookie.net/mrmen/images/e/e9/Mr_Grumpy_9a.PNG/revision/latest?cb=20171020163928"
   },
   {
     username: "happyamy2016",
